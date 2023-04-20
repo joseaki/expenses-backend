@@ -17,7 +17,7 @@ import {
 async function bootstrap() {
   // Rest configuration
   const app = await NestFactory.create(AppModule);
-  const globalPrefix = 'xxx';
+  const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
   const port = process.env.PORT || 3000;
 

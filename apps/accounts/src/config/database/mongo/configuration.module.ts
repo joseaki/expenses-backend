@@ -9,7 +9,7 @@ import { MongoConfigService } from './configuration.service';
     ConfigModule.forRoot({
       load: [configuration],
       validationSchema: Joi.object({
-        MONGO_URI: Joi.string().default('mongodb://localhost:27017'),
+        MONGO_URI: Joi.string().default('mongodb://localhost:27017/test'),
       }),
     }),
   ],
