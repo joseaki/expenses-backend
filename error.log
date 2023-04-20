@@ -1,0 +1,7 @@
+
+ >  NX   Unable to resolve @nrwl/nx-cloud:init.
+
+   ENOENT: no such file or directory, open '/Users/antonio/Developer/LenioLabs-code-challenge/expenses/node_modules/@nrwl/nx-cloud/nx-cloud/lib/generators/init/schema.json'
+   Pass --verbose to see the stacktrace.
+
+
