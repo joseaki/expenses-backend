@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { ClassTransformOptions, plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
-import { ValidationError } from 'src/interfaces/validation.interface';
+import { IValidationError } from './validate-body.interface';
 
 @Injectable()
 export class ValidatePipe implements PipeTransform {
@@ -27,14 +27,14 @@ export class ValidatePipe implements PipeTransform {
 
     if (errors.length > 0) {
       throw new UnprocessableEntityException(
-        errors.map<ValidationError>((error) => ({
+        errors.map<IValidationError>((error) => ({
           constraints: Object.values(error.constraints),
           codes: Object.keys(error.constraints),
           value: error.value,
           property: error.property,
           children: error.children,
         })),
-        'Validation error',
+        'Validation error'
       );
     }
 

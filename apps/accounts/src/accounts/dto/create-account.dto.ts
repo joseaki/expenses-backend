@@ -1,15 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
-import {
-  IsHexColor,
-  IsISO4217CurrencyCode,
-  IsNumber,
-  IsString,
-  IsUUID,
-} from 'class-validator';
+import { IsHexColor, IsISO4217CurrencyCode, IsNumber, IsString, IsUUID } from 'class-validator';
 import { IAccount, IAccountCreateResponse } from '../entities/account.entity';
 
-export class CreateAccountDto implements IAccount {
+export class CreateAccountDto implements Omit<IAccount, 'uuid'> {
   @IsString()
   @ApiProperty({
     example: 'wallet',
@@ -60,11 +54,11 @@ export class CreateAccountDto implements IAccount {
 }
 
 export class CreateAccountResponseDto implements IAccountCreateResponse {
-  @Expose()
   @ApiProperty({
     example: '123e4567-e89b-12d3-a456-426614174000',
     description: 'User uuid',
     required: true,
   })
+  @Expose()
   id: string;
 }

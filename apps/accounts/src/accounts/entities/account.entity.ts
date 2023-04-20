@@ -1,4 +1,5 @@
 export interface IAccount {
+  uuid: string;
   name: string;
   initialValue: number;
   currency: string;
