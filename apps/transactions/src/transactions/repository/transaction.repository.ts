@@ -1,6 +1,8 @@
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Transaction } from '../schemas/transaction.schema';
+import { ListTransactionQueryParamsDto } from '../dto/list-transactions.dto';
+import { IRepositoryPagination } from '../interfaces/transaction.interface';
 
 export class TransactionRepository {
   constructor(@InjectModel(Transaction.name) private transactionModel: Model<Transaction>) {}
@@ -10,12 +12,28 @@ export class TransactionRepository {
     return entity.save();
   }
 
-  findAllByAccount(accountId: string) {
-    return this.transactionModel.find({ accountId }).exec();
+  async findAllByAccount(userId: string, accountId: string, query: ListTransactionQueryParamsDto) {
+    return this.findTransactions({ userId, accountId }, query);
   }
 
-  findAllByUserId(userId: string) {
-    return this.transactionModel.find({ userId }).exec();
+  async findAllByUserId(userId: string, query: ListTransactionQueryParamsDto): Promise<IRepositoryPagination> {
+    return this.findTransactions({ userId }, query);
+  }
+
+  private async findTransactions(match: Record<string, string>, query: ListTransactionQueryParamsDto) {
+    const rowsPerPage = query.rowsPerPage ?? 10;
+    const pageNumber = query.pageNumber ? query.pageNumber - 1 : 0;
+    const skipNumber = pageNumber * rowsPerPage;
+
+    const queryModel = this.transactionModel.aggregate().match(match);
+    if (query.orderField) {
+      queryModel.sort({ [query.orderField]: query.sortType === 'desc' ? -1 : 1 });
+    }
+    const data = await queryModel
+      .group({ _id: null, items: { $push: '$$ROOT' }, count: { $sum: 1 } })
+      .project({ _id: 0, count: 1, items: { $slice: ['$items', skipNumber, rowsPerPage] } })
+      .exec();
+    return data[0];
   }
 
   updateTransaction(transactionId: string, updatedParameters: Partial<Transaction>) {

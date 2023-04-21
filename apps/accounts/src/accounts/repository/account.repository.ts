@@ -11,7 +11,7 @@ export class AccountRepository {
   }
 
   findAllByUserId(userId: string) {
-    return this.accountModel.find({ userId }).exec();
+    return this.accountModel.find({ userId }).lean();
   }
 
   updateAccount(accountId: string, updatedParameters: Partial<Account>) {

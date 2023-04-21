@@ -6,18 +6,21 @@ export const PaginationResponse = (model: any) => {
     ApiOkResponse({
       schema: {
         properties: {
-          totalPages: {
-            type: 'number',
-          },
-          currentPage: {
-            type: 'number',
-          },
-          itemsPerPage: {
-            type: 'number',
-          },
           data: {
-            type: 'array',
-            items: { $ref: getSchemaPath(model) },
+            properties: {
+              count: {
+                type: 'number',
+                example: 100,
+              },
+              page: {
+                type: 'number',
+                example: 1,
+              },
+              items: {
+                type: 'array',
+                items: { $ref: getSchemaPath(model) },
+              },
+            },
           },
         },
       },

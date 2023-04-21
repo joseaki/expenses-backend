@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseInterceptors } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { TransactionsService } from './transactions.service';
 import { CreateTransactionDto, CreateTransactionResponseDto } from './dto/create-transaction.dto';
@@ -10,9 +10,13 @@ import {
 import { ApiExtraModels, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ValidatePipe } from '@expenses/pipes';
 import { Deleted } from '@expenses/interfaces';
-import { CommonCreateResponse, CommonResponse, ListResponse } from '@expenses/dto';
+import { CommonCreateResponse, CommonResponse, PaginationResponse } from '@expenses/dto';
 import { TransformResponseInterceptor, ServiceResponseToDto } from '@expenses/interceptors';
-import { ListTransactionsResponseDto } from './dto/list-transactions.dto';
+import {
+  ListTransactionQueryParamsDto,
+  ListTransactionsResponseDto,
+  PaginationTransactionsResponseDto,
+} from './dto/list-transactions.dto';
 import { DeleteTransactionParamsDto, DeleteTransactionResponseDto } from './dto/delete-transaction.dto';
 
 @Controller('transaction')
@@ -60,11 +64,14 @@ export class TransactionsController {
     summary: 'List of all transactions',
     description: 'This endpoint lists all the transactions of the specified user',
   })
-  @ListResponse(ListTransactionsResponseDto)
-  @UseInterceptors(new ServiceResponseToDto(ListTransactionsResponseDto))
+  @PaginationResponse(ListTransactionsResponseDto)
+  @UseInterceptors(new ServiceResponseToDto(PaginationTransactionsResponseDto))
   @UseInterceptors(TransformResponseInterceptor)
-  findAllByUserId(@Param('userId') userId: string): Promise<ListTransactionsResponseDto[]> {
-    return this.transactionsService.findAllByUserId(userId);
+  findAllByUserId(
+    @Param('userId') userId: string,
+    @Query(new ValidatePipe()) query: ListTransactionQueryParamsDto
+  ): Promise<PaginationTransactionsResponseDto> {
+    return this.transactionsService.findAllByUserId(userId, query);
   }
 
   /**

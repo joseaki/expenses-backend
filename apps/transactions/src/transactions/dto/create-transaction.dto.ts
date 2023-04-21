@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
-import { IsDateString, IsEnum, IsISO4217CurrencyCode, IsNumber, IsPositive, IsString, IsUUID } from 'class-validator';
+import { IsDate, IsEnum, IsISO4217CurrencyCode, IsNumber, IsPositive, IsString, IsUUID } from 'class-validator';
 import {
   ITransaction,
   ITransactionCreateResponse,
@@ -9,15 +9,6 @@ import {
 } from '../interfaces/transaction.interface';
 
 export class CreateTransactionDto implements Omit<ITransaction, 'uuid' | 'userId'> {
-  @IsString()
-  @ApiProperty({
-    example: 'wallet',
-    description: 'Transaction name',
-    required: true,
-  })
-  @Expose()
-  name: string;
-
   @IsString()
   @IsISO4217CurrencyCode()
   @ApiProperty({
@@ -69,7 +60,7 @@ export class CreateTransactionDto implements Omit<ITransaction, 'uuid' | 'userId
   @Expose()
   accountId: string;
 
-  @IsDateString()
+  @IsDate()
   @ApiProperty({
     example: '2023-04-21T02:45:41.619Z',
     description: 'Date the transaction was performed',

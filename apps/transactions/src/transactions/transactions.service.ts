@@ -5,6 +5,8 @@ import { TransactionRepository } from './repository/transaction.repository';
 import { randomUUID } from 'crypto';
 import { Transaction } from './schemas/transaction.schema';
 import { Deleted } from '@expenses/interfaces';
+import { ListTransactionQueryParamsDto } from './dto/list-transactions.dto';
+import { IRepositoryPagination, IServicePagination } from './interfaces/transaction.interface';
 
 @Injectable()
 export class TransactionsService {
@@ -28,8 +30,12 @@ export class TransactionsService {
    * @param userId userId the transactions belongs to.
    * @returns A list of transactions.
    */
-  async findAllByUserId(userId: string): Promise<Transaction[]> {
-    return await this.transactionRepository.findAllByUserId(userId);
+  async findAllByUserId(userId: string, query: ListTransactionQueryParamsDto): Promise<IServicePagination> {
+    const repositoryData = await this.transactionRepository.findAllByUserId(userId, query);
+    return {
+      ...repositoryData,
+      page: query.pageNumber ?? 1,
+    };
   }
 
   /**

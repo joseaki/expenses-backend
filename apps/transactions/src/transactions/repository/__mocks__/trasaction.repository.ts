@@ -1,4 +1,4 @@
-export const CREATED_ACCOUNT_MOCK = {
+export const CREATED_TRANSACTION_MOCK = {
   name: 'wallet',
   initialValue: 10,
   currency: 'PEN',
@@ -9,9 +9,9 @@ export const CREATED_ACCOUNT_MOCK = {
   __v: 0,
 };
 
-export const MockAccountRepository = jest.fn().mockReturnValue({
-  createAccount: jest.fn().mockResolvedValue(CREATED_ACCOUNT_MOCK),
-  findAllByUserId: jest.fn().mockResolvedValue([CREATED_ACCOUNT_MOCK]),
-  updateAccount: jest.fn().mockResolvedValue(CREATED_ACCOUNT_MOCK),
-  deleteAccount: jest.fn().mockResolvedValue({ deletedCount: 1 }),
+export const MockTransactionRepository = jest.fn().mockReturnValue({
+  createTransaction: jest.fn().mockResolvedValue(CREATED_TRANSACTION_MOCK),
+  findAllByUserId: jest.fn().mockResolvedValue({ items: [CREATED_TRANSACTION_MOCK] }),
+  updateTransaction: jest.fn().mockResolvedValue(CREATED_TRANSACTION_MOCK),
+  deleteTransaction: jest.fn().mockResolvedValue({ deletedCount: 1 }),
 });

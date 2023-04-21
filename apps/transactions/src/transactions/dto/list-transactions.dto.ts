@@ -1,6 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ITransaction, PaymentMethod, TransactionType } from '../interfaces/transaction.interface';
-import { Expose } from 'class-transformer';
+import {
+  FieldsOrder,
+  IServicePagination,
+  ITransaction,
+  PaymentMethod,
+  SortType,
+  TransactionType,
+} from '../interfaces/transaction.interface';
+import { Expose, Type } from 'class-transformer';
+import { IsEnum, IsOptional, IsPositive } from 'class-validator';
 
 export class ListTransactionsResponseDto implements Omit<ITransaction, 'userId'> {
   @ApiProperty({
@@ -68,4 +76,74 @@ export class ListTransactionsResponseDto implements Omit<ITransaction, 'userId'>
   })
   @Expose()
   description?: string;
+}
+
+export class PaginationTransactionsResponseDto {
+  @ApiProperty({
+    example: 100,
+    description: 'Transaction uuid',
+  })
+  @Expose()
+  count: number;
+
+  @ApiProperty({
+    example: 1,
+    description: 'Transaction uuid',
+  })
+  @Expose()
+  page: number;
+
+  @ApiProperty({
+    description: 'List of transactions',
+    type: [ListTransactionsResponseDto],
+  })
+  @Type(() => ListTransactionsResponseDto)
+  @Expose()
+  items: ListTransactionsResponseDto[];
+}
+
+export class ListTransactionQueryParamsDto {
+  @IsOptional()
+  @IsPositive()
+  @ApiProperty({
+    example: 10,
+    description: 'Number of transactions to be returned',
+    required: false,
+  })
+  @Expose()
+  rowsPerPage: number;
+
+  @IsOptional()
+  @IsPositive()
+  @ApiProperty({
+    example: 1,
+    description: 'Page of the the transaction list',
+    required: false,
+  })
+  @Expose()
+  pageNumber: number;
+
+  @IsOptional()
+  @IsEnum(FieldsOrder)
+  @ApiProperty({
+    example: 'amount',
+    description: 'list of transactions ordered by field name',
+    enum: FieldsOrder,
+    type: FieldsOrder,
+    required: false,
+  })
+  @Expose()
+  orderField: FieldsOrder;
+
+  @IsOptional()
+  @IsEnum(SortType)
+  @ApiProperty({
+    example: 'asc',
+    description: 'list of transactions ordered sorted ascending or descending',
+    enum: SortType,
+    type: SortType,
+    required: false,
+  })
+  @Expose()
+  sortType: SortType;
 }
