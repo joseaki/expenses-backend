@@ -9,7 +9,9 @@ export const CREATED_ACCOUNT_MOCK = {
   __v: 0,
 };
 
-export const MockAccountRepository = {
+export const MockAccountRepository = jest.fn().mockReturnValue({
   createAccount: jest.fn().mockResolvedValue(CREATED_ACCOUNT_MOCK),
   findAllByUserId: jest.fn().mockResolvedValue([CREATED_ACCOUNT_MOCK]),
-};
+  updateAccount: jest.fn().mockResolvedValue(CREATED_ACCOUNT_MOCK),
+  deleteAccount: jest.fn().mockResolvedValue({ deletedCount: 1 }),
+});

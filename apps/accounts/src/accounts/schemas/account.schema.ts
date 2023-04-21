@@ -1,13 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import { IAccount } from '../entities/account.entity';
-import { randomUUID } from 'crypto';
 
 export type AccountDocument = HydratedDocument<Account>;
 
 @Schema()
 export class Account implements IAccount {
-  @Prop({ default: randomUUID() })
+  @Prop({ required: true })
   uuid: string;
 
   @Prop({ required: true })

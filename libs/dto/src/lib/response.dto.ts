@@ -25,9 +25,38 @@ export const PaginationResponse = (model: any) => {
   );
 };
 
-export const CommonResponse = (model: any) => {
+export const ListResponse = (model: any) => {
+  return applyDecorators(
+    ApiOkResponse({
+      schema: {
+        properties: {
+          data: {
+            type: 'array',
+            items: { $ref: getSchemaPath(model) },
+          },
+        },
+      },
+    })
+  );
+};
+
+export const CommonCreateResponse = (model: any) => {
   return applyDecorators(
     ApiCreatedResponse({
+      schema: {
+        properties: {
+          data: {
+            $ref: getSchemaPath(model),
+          },
+        },
+      },
+    })
+  );
+};
+
+export const CommonResponse = (model: any) => {
+  return applyDecorators(
+    ApiOkResponse({
       schema: {
         properties: {
           data: {

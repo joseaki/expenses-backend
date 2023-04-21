@@ -17,6 +17,7 @@
     "paths": {
       "@expenses/dto": ["libs/dto/src/index.ts"],
       "@expenses/interceptors": ["libs/interceptors/src/index.ts"],
+      "@expenses/interfaces": ["libs/interfaces/src/index.ts"],
       "@expenses/pipes": ["libs/pipes/src/index.ts"]
     }
   },
