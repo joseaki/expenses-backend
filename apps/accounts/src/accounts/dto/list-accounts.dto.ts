@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IAccount } from '../entities/account.entity';
+import { IAccount } from '../interfaces/account.interface';
 import { Expose } from 'class-transformer';
 
 export class ListAccountsResponseDto implements Omit<IAccount, 'userId'> {

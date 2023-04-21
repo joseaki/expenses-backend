@@ -15,6 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@expenses/config": ["libs/config/src/index.ts"],
       "@expenses/dto": ["libs/dto/src/index.ts"],
       "@expenses/interceptors": ["libs/interceptors/src/index.ts"],
       "@expenses/interfaces": ["libs/interfaces/src/index.ts"],

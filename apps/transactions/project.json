@@ -14,7 +14,7 @@
         "outputPath": "dist/apps/transactions",
         "main": "apps/transactions/src/main.ts",
         "tsConfig": "apps/transactions/tsconfig.app.json",
-        "assets": ["apps/transactions/src/assets"],
+        "assets": [],
         "isolatedConfig": true,
         "webpackConfig": "apps/transactions/webpack.config.js"
       },
