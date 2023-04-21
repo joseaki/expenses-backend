@@ -1,4 +1,4 @@
-import { ApiProperty, PickType } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { CreateAccountDto } from './create-account.dto';
 import { IsHexColor, IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
 import { Expose } from 'class-transformer';
