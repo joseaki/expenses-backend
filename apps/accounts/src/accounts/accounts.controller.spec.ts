@@ -13,7 +13,16 @@ describe('AccountsController', () => {
     jest.clearAllMocks();
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AccountsController],
-      providers: [{ provide: AccountsService, useValue: MockAccountService() }],
+      providers: [
+        { provide: AccountsService, useValue: MockAccountService() },
+        {
+          provide: 'AUTH_SERVICE',
+          useFactory: () => ({
+            send: jest.fn(),
+            emit: jest.fn(),
+          }),
+        },
+      ],
     }).compile();
 
     controller = module.get<AccountsController>(AccountsController);
@@ -30,16 +39,17 @@ describe('AccountsController', () => {
       initialValue: 0,
       currency: 'USD',
       color: '#000000',
-      userId: '123e4567-e89b-12d3-a456-426614174000',
     };
-    await controller.create(accountBody);
+    const userId = '123e4567-e89b-12d3-a456-426614174000';
+
+    await controller.createAccount(accountBody, { userId });
     expect(accountService.create).toHaveBeenCalledTimes(1);
-    expect(accountService.create).toHaveBeenCalledWith(accountBody);
+    expect(accountService.create).toHaveBeenCalledWith(accountBody, userId);
   });
 
   it('should call the findAllByUserId service', async () => {
     const userId = '123e4567-e89b-12d3-a456-426614174000';
-    await controller.findAllByUserId(userId);
+    await controller.findAllByUserId({ userId });
     expect(accountService.findAllByUserId).toHaveBeenCalledTimes(1);
     expect(accountService.findAllByUserId).toHaveBeenCalledWith(userId);
   });

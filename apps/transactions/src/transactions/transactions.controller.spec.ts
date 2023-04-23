@@ -13,7 +13,16 @@ describe('TransactionsController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [TransactionsController],
-      providers: [{ provide: TransactionsService, useValue: MockTransactionService() }],
+      providers: [
+        { provide: TransactionsService, useValue: MockTransactionService() },
+        {
+          provide: 'AUTH_SERVICE',
+          useFactory: () => ({
+            send: jest.fn(),
+            emit: jest.fn(),
+          }),
+        },
+      ],
     }).compile();
 
     controller = module.get<TransactionsController>(TransactionsController);
@@ -25,18 +34,18 @@ describe('TransactionsController', () => {
   });
 
   it('should call the createTransaction service', async () => {
+    const userId = '123e4567-e89b-12d3-a456-426614174000';
     const transactionBody: CreateTransactionDto = {
       currency: 'USD',
-      userId: '123e4567-e89b-12d3-a456-426614174000',
       type: TransactionType.INCOME,
       amount: 0,
       dateTime: new Date('2023-04-21T02:45:41.619Z'),
       paymentMethod: PaymentMethod.CASH,
       accountId: '123e4567-e89b-12d3-a456-426614174000',
     };
-    await controller.create(transactionBody);
+    await controller.createTransaction({ userId }, transactionBody);
     expect(transactionService.create).toHaveBeenCalledTimes(1);
-    expect(transactionService.create).toHaveBeenCalledWith(transactionBody);
+    expect(transactionService.create).toHaveBeenCalledWith(userId, transactionBody);
   });
 
   it('should call the findAllByUserId service', async () => {
@@ -47,7 +56,7 @@ describe('TransactionsController', () => {
       orderField: FieldsOrder.AMOUNT,
       sortType: SortType.ASC,
     };
-    await controller.findAllByUserId(userId, query);
+    await controller.findAllByUserId({ userId }, query);
     expect(transactionService.findAllByUserId).toHaveBeenCalledTimes(1);
     expect(transactionService.findAllByUserId).toHaveBeenCalledWith(userId, query);
   });

@@ -18,6 +18,7 @@ describe('TransactionsService', () => {
           provide: TransactionRepository,
           useValue: MockTransactionRepository(),
         },
+
         TransactionsService,
       ],
     }).compile();
@@ -31,16 +32,16 @@ describe('TransactionsService', () => {
   });
 
   it('should create a new transaction', async () => {
+    const userId = '123e4567-e89b-12d3-a456-426614174000';
     const transactionBody: CreateTransactionDto = {
       currency: 'USD',
-      userId: '123e4567-e89b-12d3-a456-426614174000',
       type: TransactionType.INCOME,
       amount: 0,
       dateTime: new Date('2023-04-21T02:45:41.619Z'),
       paymentMethod: PaymentMethod.CASH,
       accountId: '123e4567-e89b-12d3-a456-426614174000',
     };
-    const transaction = await transactionService.create(transactionBody);
+    const transaction = await transactionService.create(userId, transactionBody);
     expect(transaction).toBeDefined();
     expect(transactionRepository.createTransaction).toHaveBeenCalledWith(
       expect.objectContaining({

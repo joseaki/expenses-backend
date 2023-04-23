@@ -58,7 +58,6 @@ export class AccountsService {
     const resp = await lastValueFrom(
       this.transactionClient.send({ cmd: 'deleteAllTransactionsFromAccount' }, { accountId })
     );
-    console.log(resp);
     if (account.deletedCount > 0 && resp.deleted) {
       return { deleted: true };
     }

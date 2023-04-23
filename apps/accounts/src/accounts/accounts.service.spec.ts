@@ -4,10 +4,13 @@ import { AccountRepository } from './repository/account.repository';
 import { CreateAccountDto } from './dto/create-account.dto';
 import { CREATED_ACCOUNT_MOCK, MockAccountRepository } from './repository/__mocks__/account.repository';
 import { UpdateAccountDto } from './dto/update-account.dto';
+import { ClientProxy } from '@nestjs/microservices';
+import { of } from 'rxjs';
 
 describe('AccountsService', () => {
   let accountService: AccountsService;
   let accountRepository: AccountRepository;
+  let transactionClient: ClientProxy;
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -17,12 +20,20 @@ describe('AccountsService', () => {
           provide: AccountRepository,
           useValue: MockAccountRepository(),
         },
+        {
+          provide: 'TRANSACTION_SERVICE',
+          useFactory: () => ({
+            send: jest.fn(),
+            emit: jest.fn(),
+          }),
+        },
         AccountsService,
       ],
     }).compile();
 
     accountService = module.get<AccountsService>(AccountsService);
     accountRepository = module.get<AccountRepository>(AccountRepository);
+    transactionClient = module.get<ClientProxy>('TRANSACTION_SERVICE');
   });
 
   it('should be defined', () => {
@@ -35,9 +46,10 @@ describe('AccountsService', () => {
       initialValue: 0,
       currency: 'USD',
       color: '#000000',
-      userId: '123e4567-e89b-12d3-a456-426614174000',
     };
-    const account = await accountService.create(accountBody);
+    const userId = '123e4567-e89b-12d3-a456-426614174000';
+
+    const account = await accountService.create(accountBody, userId);
     expect(account).toBeDefined();
     expect(accountRepository.createAccount).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -76,8 +88,12 @@ describe('AccountsService', () => {
   });
 
   it('should delete an account', async () => {
+    const data = { deleted: true };
+    jest.spyOn(transactionClient, 'send').mockReturnValueOnce(of(data));
     const accountId = '123e4567-e89b-12d3-a456-426614174001';
     const account = await accountService.deleteAccount(accountId);
+    // (transactionClient.send as jest.Mock).mockReturnValueOnce(of(data));
+
     expect(account).toBeDefined();
     expect(accountRepository.deleteAccount).toBeCalledTimes(1);
     expect(accountRepository.deleteAccount).toBeCalledWith(accountId);
@@ -85,6 +101,8 @@ describe('AccountsService', () => {
   });
 
   it('should not delete an account if the repository does not return a count', async () => {
+    const data = { deleted: true };
+    jest.spyOn(transactionClient, 'send').mockReturnValueOnce(of(data));
     jest.spyOn(accountRepository, 'deleteAccount').mockResolvedValueOnce({ deletedCount: 0, acknowledged: true });
     const accountId = '123e4567-e89b-12d3-a456-426614174001';
     const account = await accountService.deleteAccount(accountId);
