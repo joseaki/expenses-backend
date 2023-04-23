@@ -1,6 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { CreateTransactionDto } from './create-transaction.dto';
-import { IsDateString, IsEnum, IsISO4217CurrencyCode, IsNumber, IsPositive, IsString, IsUUID } from 'class-validator';
+import {
+  IsDate,
+  IsDateString,
+  IsEnum,
+  IsISO4217CurrencyCode,
+  IsNumber,
+  IsOptional,
+  IsPositive,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 import { Expose } from 'class-transformer';
 import { PaymentMethod, TransactionType } from '../interfaces/transaction.interface';
 
@@ -46,7 +56,7 @@ export class UpdateTransactionDto implements Partial<Omit<CreateTransactionDto, 
   @Expose()
   accountId: string;
 
-  @IsDateString()
+  @IsDate()
   @ApiProperty({
     example: '2023-04-21T02:45:41.619Z',
     description: 'Date the transaction was performed',
@@ -65,6 +75,7 @@ export class UpdateTransactionDto implements Partial<Omit<CreateTransactionDto, 
   @Expose()
   paymentMethod: PaymentMethod;
 
+  @IsOptional()
   @IsString()
   @ApiProperty({
     example: 'supermarket',

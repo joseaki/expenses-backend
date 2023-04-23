@@ -1,7 +1,7 @@
-import { Type, applyDecorators } from '@nestjs/common';
-import { ApiCreatedResponse, ApiExtraModels, ApiOkResponse, ApiProperty, getSchemaPath } from '@nestjs/swagger';
+import { applyDecorators } from '@nestjs/common';
+import { ApiCreatedResponse, ApiOkResponse, getSchemaPath } from '@nestjs/swagger';
 
-export const PaginationResponse = (model: any) => {
+export const PaginationResponse = (model) => {
   return applyDecorators(
     ApiOkResponse({
       schema: {

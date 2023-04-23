@@ -1,5 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseInterceptors } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards, UseInterceptors } from '@nestjs/common';
 import { AccountsService } from './accounts.service';
 import { CreateAccountDto, CreateAccountResponseDto } from './dto/create-account.dto';
 import { UpdateAccountDto, UpdateAccountParamsDto, UpdateAccountResponseDto } from './dto/update-account.dto';
@@ -7,6 +6,8 @@ import { ApiExtraModels, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CommonCreateResponse, CommonResponse, ListResponse } from '@expenses/dto';
 import { ValidatePipe } from '@expenses/pipes';
 import { Deleted } from '@expenses/interfaces';
+import { AuthenticationGuard } from '@expenses/guards';
+import { UserFromToken, IUserFromToken } from '@expenses/decorators';
 import { TransformResponseInterceptor, ServiceResponseToDto } from '@expenses/interceptors';
 import { ListAccountsResponseDto } from './dto/list-accounts.dto';
 import { DeleteAccountParamsDto, DeleteAccountResponseDto } from './dto/delete-account.dto';
@@ -18,20 +19,11 @@ export class AccountsController {
   constructor(private readonly accountsService: AccountsService) {}
 
   /**
-   *
-   * @param createAccountDto
-   * @returns
-   */
-  @MessagePattern('createAccount')
-  create(@Payload() createAccountDto: CreateAccountDto) {
-    return this.accountsService.create(createAccountDto);
-  }
-
-  /**
    * Creates a new account.
    * @param createAccountDto createAccount Body.
    * @returns account created object.
    */
+  @UseGuards(AuthenticationGuard)
   @Post()
   @ApiOperation({
     summary: 'Create a new account',
@@ -40,8 +32,11 @@ export class AccountsController {
   @CommonCreateResponse(CreateAccountResponseDto)
   @UseInterceptors(new ServiceResponseToDto(CreateAccountResponseDto))
   @UseInterceptors(TransformResponseInterceptor)
-  createAccount(@Body(new ValidatePipe()) createAccountDto: CreateAccountDto): Promise<CreateAccountResponseDto> {
-    return this.accountsService.create(createAccountDto);
+  async createAccount(
+    @Body(new ValidatePipe()) createAccountDto: CreateAccountDto,
+    @UserFromToken() user: IUserFromToken
+  ): Promise<CreateAccountResponseDto> {
+    return this.accountsService.create(createAccountDto, user.userId);
   }
 
   /**
@@ -49,7 +44,8 @@ export class AccountsController {
    * @param userId user id the account belongs to.
    * @returns list of user accounts.
    */
-  @Get(':userId')
+  @UseGuards(AuthenticationGuard)
+  @Get('')
   @ApiOperation({
     summary: 'List of accounts',
     description: 'This endpoint lists all the accounts of the specified user',
@@ -57,8 +53,8 @@ export class AccountsController {
   @ListResponse(ListAccountsResponseDto)
   @UseInterceptors(new ServiceResponseToDto(ListAccountsResponseDto))
   @UseInterceptors(TransformResponseInterceptor)
-  findAllByUserId(@Param('userId') userId: string): Promise<ListAccountsResponseDto[]> {
-    return this.accountsService.findAllByUserId(userId);
+  findAllByUserId(@UserFromToken() user: IUserFromToken): Promise<ListAccountsResponseDto[]> {
+    return this.accountsService.findAllByUserId(user.userId);
   }
 
   /**
@@ -67,6 +63,7 @@ export class AccountsController {
    * @param updateParameters request body with parameters to be updated.
    * @returns account updated.
    */
+  @UseGuards(AuthenticationGuard)
   @Patch(':accountId')
   @ApiOperation({
     summary: 'Update account information',
@@ -87,6 +84,7 @@ export class AccountsController {
    * @param params Url parameters with the accountID.
    * @returns true or false if the account was deleted.
    */
+  @UseGuards(AuthenticationGuard)
   @Delete(':accountId')
   @ApiOperation({
     summary: 'Deletes an account',

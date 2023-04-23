@@ -2,7 +2,7 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Transaction } from '../schemas/transaction.schema';
 import { ListTransactionQueryParamsDto } from '../dto/list-transactions.dto';
-import { IRepositoryPagination } from '../interfaces/transaction.interface';
+import { FieldsOrder, IRepositoryPagination } from '../interfaces/transaction.interface';
 
 export class TransactionRepository {
   constructor(@InjectModel(Transaction.name) private transactionModel: Model<Transaction>) {}
@@ -23,12 +23,12 @@ export class TransactionRepository {
   private async findTransactions(match: Record<string, string>, query: ListTransactionQueryParamsDto) {
     const rowsPerPage = query.rowsPerPage ?? 10;
     const pageNumber = query.pageNumber ? query.pageNumber - 1 : 0;
+    const orderField = query.orderField ? query.orderField : FieldsOrder.DATE_TIME;
+    const sortType = query.sortType ?? 'desc';
     const skipNumber = pageNumber * rowsPerPage;
 
     const queryModel = this.transactionModel.aggregate().match(match);
-    if (query.orderField) {
-      queryModel.sort({ [query.orderField]: query.sortType === 'desc' ? -1 : 1 });
-    }
+    queryModel.sort({ [orderField]: sortType === 'desc' ? -1 : 1 });
     const data = await queryModel
       .group({ _id: null, items: { $push: '$$ROOT' }, count: { $sum: 1 } })
       .project({ _id: 0, count: 1, items: { $slice: ['$items', skipNumber, rowsPerPage] } })
@@ -44,5 +44,9 @@ export class TransactionRepository {
 
   deleteTransaction(transactionId: string) {
     return this.transactionModel.deleteOne({ uuid: transactionId });
+  }
+
+  deleteTransactions(accountId: string) {
+    return this.transactionModel.deleteMany({ accountId });
   }
 }

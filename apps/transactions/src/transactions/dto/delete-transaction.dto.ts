@@ -22,3 +22,10 @@ export class DeleteTransactionResponseDto {
   @Expose()
   deleted: boolean;
 }
+
+export class DeleteTransactionsFromAccountDto {
+  @IsString()
+  @IsUUID()
+  @Expose()
+  accountId: string;
+}

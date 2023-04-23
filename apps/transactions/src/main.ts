@@ -7,9 +7,10 @@ import { AppModule } from './app/app.module';
 async function bootstrap() {
   // Rest configuration
   const app = await NestFactory.create(AppModule);
+  app.enableCors();
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
-  const port = process.env.PORT || 3002;
+  const port = process.env.PORT || 8001;
 
   // Swagger configuration
   const config = new DocumentBuilder()
@@ -28,7 +29,7 @@ async function bootstrap() {
   const microserviceTcp = app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.TCP,
     options: {
-      port: 3003,
+      port: 9001,
     },
   });
   await app.startAllMicroservices();

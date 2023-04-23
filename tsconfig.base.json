@@ -16,7 +16,9 @@
     "baseUrl": ".",
     "paths": {
       "@expenses/config": ["libs/config/src/index.ts"],
+      "@expenses/decorators": ["libs/decorators/src/index.ts"],
       "@expenses/dto": ["libs/dto/src/index.ts"],
+      "@expenses/guards": ["libs/guards/src/index.ts"],
       "@expenses/interceptors": ["libs/interceptors/src/index.ts"],
       "@expenses/interfaces": ["libs/interfaces/src/index.ts"],
       "@expenses/pipes": ["libs/pipes/src/index.ts"]

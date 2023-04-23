@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards, UseInterceptors } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { TransactionsService } from './transactions.service';
 import { CreateTransactionDto, CreateTransactionResponseDto } from './dto/create-transaction.dto';
@@ -11,13 +11,19 @@ import { ApiExtraModels, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ValidatePipe } from '@expenses/pipes';
 import { Deleted } from '@expenses/interfaces';
 import { CommonCreateResponse, CommonResponse, PaginationResponse } from '@expenses/dto';
+import { AuthenticationGuard } from '@expenses/guards';
+import { UserFromToken, IUserFromToken } from '@expenses/decorators';
 import { TransformResponseInterceptor, ServiceResponseToDto } from '@expenses/interceptors';
 import {
   ListTransactionQueryParamsDto,
   ListTransactionsResponseDto,
   PaginationTransactionsResponseDto,
 } from './dto/list-transactions.dto';
-import { DeleteTransactionParamsDto, DeleteTransactionResponseDto } from './dto/delete-transaction.dto';
+import {
+  DeleteTransactionParamsDto,
+  DeleteTransactionResponseDto,
+  DeleteTransactionsFromAccountDto,
+} from './dto/delete-transaction.dto';
 
 @Controller('transaction')
 @ApiTags('Transactions')
@@ -30,16 +36,17 @@ import { DeleteTransactionParamsDto, DeleteTransactionResponseDto } from './dto/
 export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
 
-  @MessagePattern('createTransaction')
-  create(@Payload() createTransactionDto: CreateTransactionDto) {
-    return this.transactionsService.create(createTransactionDto);
-  }
+  // @MessagePattern('createTransaction')
+  // create(@Payload() createTransactionDto: CreateTransactionDto) {
+  //   return this.transactionsService.create(createTransactionDto);
+  // }
 
   /**
    * Creates a new transaction.
    * @param createTransactionDto createTransaction Body.
    * @returns transaction created object.
    */
+  @UseGuards(AuthenticationGuard)
   @Post()
   @ApiOperation({
     summary: 'Create a new transaction',
@@ -49,9 +56,10 @@ export class TransactionsController {
   @UseInterceptors(new ServiceResponseToDto(CreateTransactionResponseDto))
   @UseInterceptors(TransformResponseInterceptor)
   createTransaction(
+    @UserFromToken() user: IUserFromToken,
     @Body(new ValidatePipe()) createTransactionDto: CreateTransactionDto
   ): Promise<CreateTransactionResponseDto> {
-    return this.transactionsService.create(createTransactionDto);
+    return this.transactionsService.create(user.userId, createTransactionDto);
   }
 
   /**
@@ -59,7 +67,8 @@ export class TransactionsController {
    * @param userId user id the transaction belongs to.
    * @returns list of user transactions.
    */
-  @Get(':userId')
+  @UseGuards(AuthenticationGuard)
+  @Get()
   @ApiOperation({
     summary: 'List of all transactions',
     description: 'This endpoint lists all the transactions of the specified user',
@@ -68,10 +77,10 @@ export class TransactionsController {
   @UseInterceptors(new ServiceResponseToDto(PaginationTransactionsResponseDto))
   @UseInterceptors(TransformResponseInterceptor)
   findAllByUserId(
-    @Param('userId') userId: string,
+    @UserFromToken() user: IUserFromToken,
     @Query(new ValidatePipe()) query: ListTransactionQueryParamsDto
   ): Promise<PaginationTransactionsResponseDto> {
-    return this.transactionsService.findAllByUserId(userId, query);
+    return this.transactionsService.findAllByUserId(user.userId, query);
   }
 
   /**
@@ -80,6 +89,7 @@ export class TransactionsController {
    * @param updateParameters request body with parameters to be updated.
    * @returns transaction updated.
    */
+  @UseGuards(AuthenticationGuard)
   @Patch(':transactionId')
   @ApiOperation({
     summary: 'Update transaction information',
@@ -100,6 +110,7 @@ export class TransactionsController {
    * @param params Url parameters with the transactionID.
    * @returns true or false if the transaction was deleted.
    */
+  @UseGuards(AuthenticationGuard)
   @Delete(':transactionId')
   @ApiOperation({
     summary: 'Deletes an transaction',
@@ -110,5 +121,10 @@ export class TransactionsController {
   @UseInterceptors(TransformResponseInterceptor)
   deleteTransaction(@Param() params: DeleteTransactionParamsDto): Promise<Deleted> {
     return this.transactionsService.deleteTransaction(params.transactionId);
+  }
+
+  @MessagePattern({ cmd: 'deleteAllTransactionsFromAccount' })
+  deleteAllTransactionsFromAccount(@Payload() body: DeleteTransactionsFromAccountDto) {
+    return this.transactionsService.deleteAllTransactionsFromAccount(body.accountId);
   }
 }

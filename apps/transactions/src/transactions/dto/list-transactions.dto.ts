@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   FieldsOrder,
-  IServicePagination,
   ITransaction,
   PaymentMethod,
   SortType,

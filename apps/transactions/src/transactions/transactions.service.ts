@@ -6,7 +6,7 @@ import { randomUUID } from 'crypto';
 import { Transaction } from './schemas/transaction.schema';
 import { Deleted } from '@expenses/interfaces';
 import { ListTransactionQueryParamsDto } from './dto/list-transactions.dto';
-import { IRepositoryPagination, IServicePagination } from './interfaces/transaction.interface';
+import { IServicePagination } from './interfaces/transaction.interface';
 
 @Injectable()
 export class TransactionsService {
@@ -17,10 +17,11 @@ export class TransactionsService {
    * @param createTransactionDto body to create a new transaction.
    * @returns id of the new transaction.
    */
-  async create(createTransactionDto: CreateTransactionDto): Promise<CreateTransactionResponseDto> {
+  async create(userId: string, createTransactionDto: CreateTransactionDto): Promise<CreateTransactionResponseDto> {
     const response = await this.transactionRepository.createTransaction({
-      uuid: randomUUID(),
       ...createTransactionDto,
+      uuid: randomUUID(),
+      userId,
     });
     return { id: response.uuid };
   }
@@ -59,5 +60,15 @@ export class TransactionsService {
       return { deleted: true };
     }
     return { deleted: false };
+  }
+
+  /**
+   * Delete all transactions belonging to an account.
+   * @param accountId account id transactions belongs to.
+   * @returns true if the transactions were deleted.
+   */
+  async deleteAllTransactionsFromAccount(accountId: string) {
+    await this.transactionRepository.deleteTransactions(accountId);
+    return { deleted: true };
   }
 }
