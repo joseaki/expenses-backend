@@ -1,9 +1,16 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, UseInterceptors } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
+import { ValidatePipe } from '@expenses/pipes';
+import { TransformResponseInterceptor, ServiceResponseToDto } from '@expenses/interceptors';
+import { CommonCreateResponse } from '@expenses/dto';
 
 import { AppService } from './app.service';
+import { ApiExtraModels, ApiTags } from '@nestjs/swagger';
+import { VerifyTokenDto, VerifyTokenResponseDto } from './dto/authentication.dto';
 
-@Controller('authentication')
+@Controller()
+@ApiTags('Authentication')
+@ApiExtraModels(VerifyTokenResponseDto)
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
@@ -13,16 +20,16 @@ export class AppController {
    * @returns
    */
   @MessagePattern({ cmd: 'verifyToken' })
-  async create(@Payload() body: { token: string }) {
-    console.log(body);
+  async create(@Payload(new ValidatePipe()) body: VerifyTokenDto) {
     const resp = await this.appService.verifyToken(body.token);
     return { data: resp };
   }
 
   @Post('verify')
-  async verifyToken(@Body() body: { token: string }) {
-    console.log(body);
-    const resp = await this.appService.verifyToken(body.token);
-    return { data: resp };
+  @CommonCreateResponse(VerifyTokenResponseDto)
+  @UseInterceptors(new ServiceResponseToDto(VerifyTokenResponseDto))
+  @UseInterceptors(TransformResponseInterceptor)
+  async verifyToken(@Body(new ValidatePipe()) body: VerifyTokenDto) {
+    return this.appService.verifyToken(body.token);
   }
 }

@@ -25,7 +25,7 @@ import {
   DeleteTransactionsFromAccountDto,
 } from './dto/delete-transaction.dto';
 
-@Controller('transaction')
+@Controller()
 @ApiTags('Transactions')
 @ApiExtraModels(
   CreateTransactionResponseDto,

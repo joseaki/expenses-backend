@@ -12,7 +12,7 @@ import { TransformResponseInterceptor, ServiceResponseToDto } from '@expenses/in
 import { ListAccountsResponseDto } from './dto/list-accounts.dto';
 import { DeleteAccountParamsDto, DeleteAccountResponseDto } from './dto/delete-account.dto';
 
-@Controller('account')
+@Controller()
 @ApiTags('Accounts')
 @ApiExtraModels(CreateAccountResponseDto, ListAccountsResponseDto, UpdateAccountResponseDto, DeleteAccountResponseDto)
 export class AccountsController {

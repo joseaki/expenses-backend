@@ -30,7 +30,7 @@ async function bootstrap() {
     .setTitle('MS Accounts')
     .setDescription('Create expenses accounts')
     .setVersion('1.0')
-    .addTag('Accounts')
+    .addTag('Authentication')
     .build();
   const options: SwaggerDocumentOptions = {
     operationIdFactory: (controllerKey: string, methodKey: string) => methodKey,

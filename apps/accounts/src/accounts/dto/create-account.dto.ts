@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
-import { IsHexColor, IsISO4217CurrencyCode, IsNumber, IsString, IsUUID } from 'class-validator';
+import { IsHexColor, IsISO4217CurrencyCode, IsNumber, IsString } from 'class-validator';
 import { IAccount, IAccountCreateResponse } from '../interfaces/account.interface';
 
 export class CreateAccountDto implements Omit<IAccount, 'uuid' | 'userId'> {
