@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards, UseInterc
 import { AccountsService } from './accounts.service';
 import { CreateAccountDto, CreateAccountResponseDto } from './dto/create-account.dto';
 import { UpdateAccountDto, UpdateAccountParamsDto, UpdateAccountResponseDto } from './dto/update-account.dto';
-import { ApiExtraModels, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiExtraModels, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CommonCreateResponse, CommonResponse, ListResponse } from '@expenses/dto';
 import { ValidatePipe } from '@expenses/pipes';
 import { Deleted } from '@expenses/interfaces';
@@ -12,6 +12,7 @@ import { TransformResponseInterceptor, ServiceResponseToDto } from '@expenses/in
 import { ListAccountsResponseDto } from './dto/list-accounts.dto';
 import { DeleteAccountParamsDto, DeleteAccountResponseDto } from './dto/delete-account.dto';
 
+@ApiBearerAuth()
 @Controller()
 @ApiTags('Accounts')
 @ApiExtraModels(CreateAccountResponseDto, ListAccountsResponseDto, UpdateAccountResponseDto, DeleteAccountResponseDto)

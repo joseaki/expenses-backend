@@ -18,6 +18,7 @@ async function bootstrap() {
     .setDescription('Create expenses accounts')
     .setVersion('1.0')
     .addTag('Accounts')
+    .addBearerAuth()
     .build();
   const options: SwaggerDocumentOptions = {
     operationIdFactory: (controllerKey: string, methodKey: string) => methodKey,

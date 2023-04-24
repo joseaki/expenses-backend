@@ -27,7 +27,7 @@ async function bootstrap() {
 
   // Swagger configuration
   const config = new DocumentBuilder()
-    .setTitle('MS Accounts')
+    .setTitle('MS Authentication')
     .setDescription('Create expenses accounts')
     .setVersion('1.0')
     .addTag('Authentication')

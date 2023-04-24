@@ -7,7 +7,7 @@ import {
   UpdateTransactionParamsDto,
   UpdateTransactionResponseDto,
 } from './dto/update-transaction.dto';
-import { ApiExtraModels, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiExtraModels, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ValidatePipe } from '@expenses/pipes';
 import { Deleted } from '@expenses/interfaces';
 import { CommonCreateResponse, CommonResponse, PaginationResponse } from '@expenses/dto';
@@ -25,6 +25,7 @@ import {
   DeleteTransactionsFromAccountDto,
 } from './dto/delete-transaction.dto';
 
+@ApiBearerAuth()
 @Controller()
 @ApiTags('Transactions')
 @ApiExtraModels(
